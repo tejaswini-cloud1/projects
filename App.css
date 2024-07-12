@@ -1,0 +1,207 @@
+.App {
+  text-align: center;
+}
+body{
+  height: auto;
+  width:auto;
+}
+.App-logo {
+  height: 40vmin;
+  pointer-events: none
+}
+
+
+@media screen and (max-width:1024px) {
+  body{
+    height: auto;
+    width: auto;
+  }
+.WhatsappImage20240705At43519Pm2{
+  margin-left: 5rem;
+margin-top: 10rem;
+
+}
+.WelcomeBackToGkbLabs{
+  margin-left: 5rem;
+  margin-top: 9rem;
+}
+.GetItStraight{
+  margin-left: 8rem;
+  margin-top: 10rem;
+}
+.Rectangle16{
+  margin-top: 20rem;
+}
+.Rectangle15{
+  margin-top: 10rem;
+}
+.FacebookLogo3{
+  margin-top: 15rem;
+}
+.Google3{
+  margin-top: 15rem;
+}
+.SignInWithGoogle{
+  margin-top: 15rem;
+}
+.SignInWithFacebook{
+  margin-top: 15rem;
+  
+}
+.DonYHaveAnAccountSignUp{
+ position: relative ;
+ top: -17rem;
+ 
+}
+.Rectangle6{
+  margin-top: 15rem;
+}
+.Login{
+  margin-top: 15rem;
+}
+.Group20{
+ position: absolute;
+ top: 17rem;
+}
+.Hide5{
+  
+  margin-top: 17rem;
+}
+.ForgotPassword{
+  margin-top: 18rem;
+  font-size: 20px;
+}
+.Password{
+  margin-top: 17rem; 
+}
+.Rectangle4{
+  position: absolute;
+  top: 15rem;
+}
+.EnterYourUserName{
+  margin-top: 15rem; 
+}
+.UserName{
+  margin-top: 13rem; 
+}
+.ContinueWithGoogleOrFacebookOrEnterYourDetails{
+  margin-top: 10rem;
+ 
+}
+.SignInTo{
+  margin-top: 8rem;
+}
+
+}
+@media only screen and (max-width: 768px) {
+  body{
+    height: auto;
+   width: auto;
+  }
+  .WhatsappImage20240705At43519Pm2{
+    margin-left: 33rem;
+  margin-top: -10rem;
+  
+  }
+  .WelcomeBackToGkbLabs{
+    margin-left: 30rem;
+    margin-top: -10rem;
+  }
+  .GetItStraight{
+    margin-left: 35rem;
+    margin-top: -10rem;
+  }
+  .Rectangle15{
+    margin-top: 30rem;
+    margin-left: -15rem; 
+     
+  }
+  .Rectangle16 {
+    margin-top: 30rem;
+    margin-left: -15rem; 
+    
+     
+  }
+  .FacebookLogo3{
+    margin-top: 30rem;
+    margin-left: -15rem;
+  }
+  .Google3{
+    margin-top: 30rem;
+    margin-left: -15rem;
+  }
+  .SignInWithGoogle{
+    margin-top: 30rem;
+    margin-left: -15rem;
+  }
+  .SignInWithFacebook{
+    margin-top: 30rem;
+    margin-left: -15rem;
+    
+  }
+  .DonYHaveAnAccountSignUp{
+   position: relative ;
+   top: -3rem;
+left: -15rem;
+  }
+  .Rectangle6{
+    margin-top: 30rem;
+    margin-left: -15rem;
+  }
+  .Login{
+    margin-top: 30rem;
+    margin-left: -15rem;
+  }
+  .Group20{
+   position: absolute;
+   top: 29rem;
+   left: -15rem;
+  }
+  .Hide5{
+  margin-left: -15rem;
+    margin-top: 29rem;
+  }
+  .ForgotPassword{
+    margin-top: 30rem;
+    font-size: 20px;
+    margin-left: -15rem;
+  }
+  .Password{
+    margin-top: 28rem; 
+    margin-left: -15rem;
+  }
+  .Rectangle4{
+    position: absolute;
+    top: 28rem;
+  }
+  .EnterYourUserName{
+    margin-top: 28rem; 
+  }
+  .UserName{
+    margin-top: 27rem; 
+    margin-left: -15rem;
+  }
+  .ContinueWithGoogleOrFacebookOrEnterYourDetails{
+    margin-top: 26rem;
+    margin-left: -15rem;
+   
+  }
+  .SignInTo{
+    margin-top: 25rem;
+    margin-left: -15rem;
+  }
+  
+}
+
+@media only screen and (max-width: 480px) {
+  /* Adjust layout for phones */
+  .WhatsappImage20240705At43519Pm2{
+    margin-left: 33rem;
+    height: 100rem;
+  }
+  .Rectangle15{
+    position: absolute;
+    top: 50rem;
+  }
+ 
+}
