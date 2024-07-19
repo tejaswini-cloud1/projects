@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTML Table to JSON</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+  <table id="myTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Email</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>John Doe</td>
+        <td>john@example.com</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>Jane Smith</td>
+        <td>jane@example.com</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <button id="convertButton">Convert Table to JSON</button>
+
+  <pre id="output"></pre>
+
+  <script>
+    $(document).ready(function() {
+      $('#convertButton').click(function() {
+        const headers = [];
+        const jsonData = [];
+
+        $('#myTable thead th').each(function() {
+          headers.push($(this).text());
+        });
+
+        $('#myTable tbody tr').each(function() {
+          const row = {};
+          $(this).find('td').each(function(i) {
+            row[headers[i]] = $(this).text();
+          });
+          jsonData.push(row);
+        });
+
+        $('#output').text(JSON.stringify(jsonData, null, 2));
+      });
+    });
+  </script>
+</body>
+</html>
+
