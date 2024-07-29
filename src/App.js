@@ -1,177 +1,154 @@
-import './forgot.js';
-import React from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
+import { BrowserRouter as Router, Route, Routes, Link, Navigate } from 'react-router-dom';
+import FacebookLogin from 'react-facebook-login';
 import './App.css';
 import googleLogo from './assets/google.png';
 import facebookLogo from './assets/facebook.jpg';
 import gkbLogo from './assets/gkb.jpg';
+import Home from './Home';
+import ForgotPassword from './forgot';
+import Signup from './components/Signup';
 
 const facebookAppId = process.env.REACT_APP_FACEBOOK_APP_ID;
 const serverApiUrl = process.env.REACT_APP_SERVER_API_URL;
 
-class App extends React.Component {
-  componentDidMount() {
-    window.fbAsyncInit = () => {
-      window.FB.init({
-        appId: facebookAppId,
-        cookie: true,
-        xfbml: true,
-        version: 'v14.0'
+const App = () => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isFormValid, setIsFormValid] = useState(false);
+
+  const handleLogin = () => {
+    if (username.trim() === '' || password.trim() === '') {
+      alert('Please fill in both fields.');
+      return;
+    }
+    // Perform login logic here
+    setIsAuthenticated(true);
+  };
+
+  const handleGoogleLogin = () => {
+    // Perform Google login logic here
+    setIsAuthenticated(true);
+  };
+
+  const handleFacebookLogin = (response) => {
+    if (response.status !== 'unknown') {
+      // Facebook login success
+      console.log('Facebook login success:', response);
+      // Save user profile to server
+      saveUserProfileToServer(response).catch(error => {
+        console.error('Error saving user profile to server: ', error.message);
       });
-      window.FB.AppEvents.logPageView();
-    };
-    (function (d, s, id) {
-      var js, fjs = d.getElementsByTagName(s)[0];
-      if (d.getElementById(id)) { return; }
-      js = d.createElement(s); js.id = id;
-      js.src = "https://connect.facebook.net/en_US/sdk.js";
-      fjs.parentNode.insertBefore(js, fjs);
-    }(document, 'script', 'facebook-jssdk'));
-  }
+      setIsAuthenticated(true);
+    } else {
+      console.log('Facebook login failed');
+    }
+  };
 
-  handleFacebookLogin = () => {
-    window.FB.login((response) => {
-      if (response.authResponse) {
-        window.FB.api('/me', { fields: 'name,email,picture' }, (response) => {
-          console.log('Good to see you, ' + response.name + '.');
-          console.log('Your email is ' + response.email);
-          console.log('Your profile picture URL is ' + response.picture.data.url);
-          // You can now store the user info in your state or context
-
-          // Save user profile to server
-          this.saveUserProfileToServer(response).catch(error => {
-            console.error('Error saving user profile to server: ', error.message);
-          });
-        });
-      } else {
-        console.log('User cancelled login or did not fully authorize.');
-      }
-    }, { scope: 'email' });
-  }
-
-  saveUserProfileToServer = async (userProfile) => {
+  const saveUserProfileToServer = async (userProfile) => {
     try {
       const response = await axios.post(`${serverApiUrl}/saveUserProfile`, userProfile);
       console.log('User profile saved to server:', response.data);
     } catch (error) {
       console.error('Error saving user profile to server:', error.message);
     }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    if (name === 'username') setUsername(value);
+    if (name === 'password') setPassword(value);
+    validateForm();
+  };
+
+  const validateForm = () => {
+    const isFormValid = username.trim() !== '' && password.trim() !== '';
+    setIsFormValid(isFormValid);
+  };
+
+  if (isAuthenticated) {
+    return <Navigate to="/home" />;
   }
 
-  saveUserProfileToDatabase = async (userProfile) => {
-    let connection;
-    try {
-      connection = await mysql.createConnection({
-        host: process.env.REACT_APP_DB_HOST,
-        user: process.env.REACT_APP_DB_USER,
-        password: process.env.REACT_APP_DB_PASSWORD,
-        database: process.env.REACT_APP_DB_NAME
-      });
-
-      const insertQuery = `
-          INSERT INTO employee (Name, Email_id)
-          VALUES (?, ?)
-        `;
-
-      const [result] = await connection.execute(insertQuery, [userProfile.name, userProfile.email]);
-      console.log('User profile saved to database:', result);
-    } catch (error) {
-      console.error('Error saving user profile to database:', error.message);
-    } finally {
-      if (connection) {
-        await connection.end();
-      }
-    }
-  }
-
-  // Main function to get user profile and save it to the database
-  getUserProfileAndSave = async () => {
-    try {
-      const userProfile = await this.getUserProfile();
-      await this.saveUserProfileToDatabase(userProfile);
-    } catch (error) {
-      console.error('Error in main function:', error.message);
-    }
-  }
-
-  getUserProfile = () => {
-    // Implement getUserProfile logic here
-  }
-
-
-  render() {
-    return (
-      <div className="HtmlBody" style={{ width: 1440, height: 997, position: 'relative' }}>
-        <img className="WhatsappImage20240705At43519Pm2" style={{ width: 400, height: 250, left: 70, top: 130, position: 'absolute' }} src={gkbLogo} />
-        <div className="WelcomeBackToGkbLabs" style={{ width: 400, left: 113, top: 379, position: 'absolute', color: 'black', fontSize: 50, fontFamily: 'Poppins', fontWeight: '600', lineHeight: -10, wordWrap: 'break-word' }}>Welcome back,<br />to GKB Labs!</div>
-        <div className="Frame12" style={{ width: 423, height: 714, paddingTop: 25, paddingBottom: 25, left: 813, top: 126, position: 'absolute', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'inline-flex' }} >
-          <div className="Frame18" style={{ alignSelf: 'stretch', height: 664, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 25, display: 'inline-flex' }}>
-            <div className="Frame17" style={{ flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 7, display: 'flex' }}>
-              <div className="SignInTo" style={{ color: 'black', fontFamily: 'Poppins', fontWeight: '500', position: 'absolute', top: -70, wordWrap: 'break-word' }}>Sign in to  </div>
-              <div className="ContinueWithGoogleOrFacebookOrEnterYourDetails" style={{ color: 'black', fontFamily: 'Poppins', fontWeight: '400', position: 'absolute', top: -20, wordWrap: 'break-word' }}>Continue with google or facebook or enter your details</div>
-            </div>
-            <div className="Frame15" style={{ justifyContent: 'center', alignItems: 'center', display: 'inline-flex' }}>
-              <div className="Group26" style={{ width: 425, height: 361, position: 'relative' }}>
-                <div className="Group21" style={{ width: 423, height: 92, left: 0, top: 0, position: 'absolute', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 9, display: 'inline-flex' }}>
-                  <div className="UserName" style={{ width: 390, color: 'black', fontFamily: 'Poppins', fontWeight: '600', position: 'absolute', top: -80, wordWrap: 'break-word' }}>User name</div>
-                  <div className="Group20" style={{ width: 425, height: 60, position: 'relative', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', position: 'absolute', top: -50, display: 'flex' }}>
-                    <div className="Rectangle4" style={{ borderRadius: 6, border: '0.60px #282828 solid' }} />
-
-
-                    <input className="text1" type="text" placeholder=' Enter your Name' style={{ fontSize: 30, height: 70, width: 425, border: '0.60px #282828 solid' }} />
-                  </div>
-                </div>
-                <div className="Group23" style={{ width: 423, height: 92, left: 0, top: 130, position: 'absolute' }}>
-                  <div className="Group22" style={{ width: 423, height: 92, left: 0, top: 0, position: 'absolute', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 9, display: 'inline-flex' }}>
-                    <div className="Password" style={{ width: 390, color: 'black', fontFamily: 'Poppins', fontWeight: '600', position: 'absolute', top: -100, wordWrap: 'break-word' }}>Password</div>
-                    <div className="Group20" style={{ width: 425, height: 60, position: 'relative', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex' }}>
-                      <div className="Rectangle5" style={{ borderRadius: 6, position: 'absolute', border: '0.60px #282828 solid' }} />
-
-                      <input className="text2" type="password" placeholder=' Enter your Password' style={{ top: -60, position: 'absolute', height: 50, width: 425, fontSize: 30, border: '0.60px #282828 solid' }} />
-                    </div>
-                  </div>
-                  <div className="hide" style={{ width: 21, height: 21, paddingTop: 1.43, paddingBottom: 1.43, left: 374, top: 52, position: 'absolute', justifyContent: 'center', alignItems: 'center', display: 'inline-flex' }}>
-                    <div className="Group" style={{ width: 21, height: 18.13, position: 'relative' }}>
-
-                      <div className="Vector" style={{ width: 3.02, height: 3.02, left: 10.34, top: 5.73, position: 'absolute', }}></div>
-                      <div className="Vector" style={{ width: 14.31, height: 11.69, left: 6.69, top: 1.43, position: 'absolute', }}></div>
-                      <div className="Vector" style={{ width: 19.09, height: 18.13, left: 0, top: 0, position: 'absolute', }}></div>
-                    </div>
-                  </div>
-                </div>
-                <div className="ForgotPassword" style={{ left: 270, top: 140, position: 'absolute', color: '#4D4D4D', fontSize: 20, fontFamily: 'Poppins', fontWeight: '300', wordWrap: 'break-word' }}>Forgot Password ?</div>
-                <div className="Group25" style={{ width: 425, height: 60, left: 0, top: 301, position: 'absolute' }}>
-                  <div className="Rectangle6" /><a href='#'><button className='loginbutton'>Login</button></a>
-                  <div className="Login" style={{ left: 190, top: -86, position: 'absolute', color: 'white', fontSize: 18, fontFamily: 'Poppins', fontWeight: '500', wordWrap: 'break-word' }}></div>
+  return (
+    <div className="HtmlBody" style={{ width: 1440, height: 997, position: 'relative' }}>
+      <img className="WhatsappImage20240705At43519Pm2" style={{ width: 400, height: 250, left: 70, top: 130, position: 'absolute' }} src={gkbLogo} />
+      <div className="WelcomeBackToGkbLabs" style={{ width: 400, left: 113, top: 379, position: 'absolute', color: 'black', fontSize: 50, fontFamily: 'Poppins', fontWeight: '600', lineHeight: -10, wordWrap: 'break-word' }}>Welcome back,<br />to GKB Labs!</div>
+      <div className="Frame12" style={{ width: 423, height: 714, paddingTop: 25, paddingBottom: 25, left: 813, top: 126, position: 'absolute', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'inline-flex' }}>
+        <div className="Frame18" style={{ alignSelf: 'stretch', height: 664, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 25, display: 'inline-flex' }}>
+          <div className="Frame17" style={{ flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 7, display: 'flex' }}>
+            <div className="SignInTo" style={{ color: 'black', fontFamily: 'Poppins', fontWeight: '500', position: 'absolute', top: -70, wordWrap: 'break-word' }}>Sign in to</div>
+            <div className="ContinueWithGoogleOrFacebookOrEnterYourDetails" style={{ color: 'black', fontFamily: 'Poppins', fontWeight: '400', position: 'absolute', top: -20, wordWrap: 'break-word' }}>Continue with Google or Facebook or enter your details</div>
+          </div>
+          <div className="Frame15" style={{ justifyContent: 'center', alignItems: 'center', display: 'inline-flex' }}>
+            <div className="Group26" style={{ width: 425, height: 361, position: 'relative' }}>
+              <div className="Group21" style={{ width: 423, height: 92, left: 0, top: 0, position: 'absolute', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 9, display: 'inline-flex' }}>
+                <div className="UserName" style={{ width: 390, color: 'black', fontFamily: 'Poppins', fontWeight: '600', position: 'absolute', top: -80, wordWrap: 'break-word' }}>User name</div>
+                <div className="Group20" style={{ width: 425, height: 60, position: 'relative', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', position: 'absolute', top: -50, display: 'flex' }}>
+                  <div className="Rectangle4" style={{ borderRadius: 6, border: '0.60px #282828 solid' }} />
+                  <input className="text1" type="text" name="username" placeholder=' Enter your Name' style={{ fontSize: 30, height: 70, width: 425, border: '0.60px #282828 solid' }} onChange={handleInputChange} />
                 </div>
               </div>
-            </div>
-            <div className="Frame14" style={{ paddingRight: 3, justifyContent: 'center', alignItems: 'center', display: 'inline-flex' }}>
-              <div className="DonYHaveAnAccountSignUp"><span style={{ color: '#7D7D7D', fontSize: 20, fontFamily: 'Poppins', fontWeight: '300', position: 'absolute', top: 380, left: 20, wordWrap: 'break-word' }}><pre>Don’t have an Account?</pre></span><span style={{ color: 'black', fontSize: 20, fontFamily: 'Poppins', fontWeight: '600', position: 'absolute', top: 380, left: 270, wordWrap: 'break-word' }}> <pre>Sign Up</pre> </span></div>
-            </div>
-            <div className="Frame13" style={{ width: 425, justifyContent: 'center', alignItems: 'center', display: 'inline-flex' }}>
-              <div className="Group50" style={{ width: 425, height: 60, position: 'relative' }}>
-                <div className="Rectangle16" /> <a href='#'><button className='googleloginbutton'>Sign In With Google</button></a>
-                <div className="Google" style={{ width: 26.12, height: 28.36, left: 26, top: 14, position: 'absolute' }}>
-
+              <div className="Group23" style={{ width: 423, height: 92, left: 0, top: 130, position: 'absolute' }}>
+                <div className="Group22" style={{ width: 423, height: 92, left: 0, top: 0, position: 'absolute', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 9, display: 'inline-flex' }}>
+                  <div className="Password" style={{ width: 390, color: 'black', fontFamily: 'Poppins', fontWeight: '600', position: 'absolute', top: -100, wordWrap: 'break-word' }}>Password</div>
+                  <div className="Group20" style={{ width: 425, height: 60, position: 'relative', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex' }}>
+                    <div className="Rectangle5" style={{ borderRadius: 6, position: 'absolute', border: '0.60px #282828 solid' }} />
+                    <input className="text2" type="password" name="password" placeholder=' Enter your Password' style={{ top: -60, position: 'absolute', height: 50, width: 425, fontSize: 30, border: '0.60px #282828 solid' }} onChange={handleInputChange} />
+                  </div>
                 </div>
-                <div className="SignInWithGoogle" style={{ width: 153.72, height: 26.18, left: 150, top: -85, position: 'absolute', color: 'black', fontSize: 19, fontFamily: 'Poppins', fontWeight: '400', wordWrap: 'break-word' }}></div>
+                <Link to="/forgotpassword" className="ForgotPassword" style={{ left: 270, top: 10, position: 'absolute', color: '#4D4D4D', fontSize: 20, fontFamily: 'Poppins', fontWeight: '300', wordWrap: 'break-word' }}>Forgot Password?</Link>
               </div>
-              <img className="Google3" style={{ width: 40, height: 40, left: 20, top: 440, position: 'absolute', borderRadius: 50 }} src={googleLogo} />
-            </div>
-            <div className="Frame18" style={{ width: 423, height: 55, position: 'relative' }}>
-              <div className="Group50" style={{ position: 'absolute' }}>
-                <a href='#'><button className='facebookloginbutton' onClick={this.handleFacebookLogin}>Sign In With facebook</button></a>
-                <div className="SignInWithFacebook" ></div>
+              <div className="Group25" style={{ width: 425, height: 60, left: 0, top: 301, position: 'absolute' }}>
+                <div className="Rectangle6" /><button className='loginbutton' onClick={handleLogin}>Login</button>
+                <div className="Login" style={{ left: 190, top: -86, position: 'absolute', color: 'white', fontSize: 18, fontFamily: 'Poppins', fontWeight: '500', wordWrap: 'break-word' }}></div>
               </div>
-              <img className="FacebookLogo3" style={{ width: 44, height: 40, left: 19, top: -93, position: 'absolute', borderRadius: 50 }} src={facebookLogo} />
             </div>
           </div>
+          <div className="Frame14" style={{ paddingRight: 3, justifyContent: 'center', alignItems: 'center', display: 'inline-flex' }}>
+            <div className="DonYHaveAnAccountSignUp"><span style={{ color: '#7D7D7D', fontSize: 20, fontFamily: 'Poppins', fontWeight: '300', position: 'absolute', top: 380, left: 20, wordWrap: 'break-word' }}><pre>Don’t have an Account?</pre></span><Link to="/signup" style={{ color: 'black', fontSize: 20, fontFamily: 'Poppins', fontWeight: '600', position: 'absolute', top: 380, left: 270, wordWrap: 'break-word' }}> <pre>Sign Up</pre> </Link></div>
+          </div>
+          <div className="Frame13" style={{ width: 425, justifyContent: 'center', alignItems: 'center', display: 'inline-flex' }}>
+            <div className="Group50" style={{ width: 425, height: 60, position: 'relative' }}>
+              <div className="Rectangle16" />
+              <button className='googleloginbutton' onClick={handleGoogleLogin}>Sign In With Google</button>
+              <div className="Google" style={{ width: 26.12, height: 28.36, left: 26, top: 14, position: 'absolute' }}></div>
+              <div className="SignInWithGoogle" style={{ width: 153.72, height: 26.18, left: 150, top: -85, position: 'absolute', color: 'black', fontSize: 19, fontFamily: 'Poppins', fontWeight: '400', wordWrap: 'break-word' }}></div>
+            </div>
+            <img className="Google3" style={{ width: 40, height: 40, left: 20, top: 440, position: 'absolute', borderRadius: 50 }} src={googleLogo} />
+          </div>
+          <div className="Frame18" style={{ width: 423, height: 55, position: 'relative' }}>
+            <div className="Group50" style={{ position: 'absolute' }}>
+              <FacebookLogin
+                appId={facebookAppId}
+                autoLoad={false}
+                fields="name,email,picture"
+                callback={handleFacebookLogin}
+                cssClass="facebookloginbutton"
+                // icon={<img src={facebookLogo} alt="Facebook" style={{ width: '24px', height: '24px', marginRight: '8px' }} />}
+                textButton="Sign In With Facebook"
+              />
+            </div>
+            <img className="FacebookLogo3" style={{ width: 44, height: 40, left: 19, top: -93, position: 'absolute', borderRadius: 50 }} src={facebookLogo} />
+          </div>
         </div>
-        <div className="GetItStraight" style={{ left: 113, top: 508, position: 'absolute', color: 'black', fontSize: 35, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word' }}>Get IT straight</div>
       </div>
-    );
-  }
-}
+      <div className="GetItStraight" style={{ left: 113, top: 508, position: 'absolute', color: 'black', fontSize: 35, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word' }}>Get IT straight</div>
+    </div>
+  );
+};
 
-export default App;
+const MainApp = () => (
+  <Router>
+    <Routes>
+      <Route path="/home" element={<Home />} />
+      <Route path="/forgotpassword" element={<ForgotPassword />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/" element={<App />} />
+    </Routes>
+  </Router>
+);
+
+export default MainApp;
